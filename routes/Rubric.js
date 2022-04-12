@@ -1,10 +1,11 @@
 import express from 'express'
 
-import {createRubric, getAllRubrics} from "../controllers/Rubric.js";
+import {createRubric, getAllRubrics, deleteRubric} from "../controllers/Rubric.js";
 
 const router = express.Router();
 
 router.get('', getAllRubrics);
-router.get('/create', createRubric);
+router.post('/create', createRubric);
+router.delete('/:id', deleteRubric);
 
 export default router

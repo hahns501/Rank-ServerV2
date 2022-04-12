@@ -23,6 +23,11 @@ export const getImagesByProject = async (req,res) => {
 }
 
 export const getUserProjects = async (req,res) => {
+    if (req.user.role === 'admin'){
+        res.status(200).send('');
+    }
+
+
     console.log('Inside getUserProjects');
     let id = req.user.id;
 
@@ -35,9 +40,9 @@ export const getUserProjects = async (req,res) => {
     try{
         let data = await pool.query(q, id);
         console.log(data[0]);
-        let projects = data[0].map(p => p.project_name);
+        // let projects = data[0].map(p => p.project_name);
 
-        res.status(200).json(projects);
+        res.status(200).json(data[0]);
     }catch(err){
         console.log(err);
     }
