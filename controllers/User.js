@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import pool from '../db.js';
 import {Verify} from '../middleware/Verify.js';
 
 const users = [
@@ -31,7 +32,18 @@ const generateRefreshToken = (user) => {
 let refreshTokens = []
 
 export const getAllUsers = async(req,res)=>{
-    console.log('fart');
+    let q = 'select * from user';
+
+    console.log("Fetching all users");
+    try{
+        let users = await pool.query(q);
+        console.log(users);
+        res.status(200).json(users[0]);
+    }catch(err){
+        console.log(err);
+
+        res.status(400).send('Database Error');
+    }
 }
 
 export const refreshToken = async (req, res) => {

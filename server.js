@@ -17,6 +17,7 @@ import userRoutes from './routes/User.js';
 import rubricRoutes from './routes/Rubric.js';
 import dicomRoutes from './routes/Dicom.js';
 import projectRoutes from './routes/Project.js';
+import imageRoutes from './routes/Image.js';
 
 import {insert} from './database/queries.js';
 
@@ -113,5 +114,6 @@ app.use('/user', userRoutes);
 app.use('/rubric', rubricRoutes);
 app.use('/dicom', dicomRoutes);
 app.use('/project', projectRoutes);
+app.use('/image', imageRoutes);
 
 
