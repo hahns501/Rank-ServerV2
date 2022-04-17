@@ -102,26 +102,6 @@ export const getAllRubrics = async (req, res) => {
         },{});
 
 
-        // const result = data.map((v) => {
-        //     let question = {
-        //         question_id: v.question_id,
-        //         question: v.question,
-        //         description: v.description,
-        //         min: v.min,
-        //         max: v.max,
-        // }
-        //
-        // console.log(question)
-        // })
-
-        // const result = data.map((v)=>{
-        //     console.log(v);
-        // })
-
-
-        // console.log(result);
-
-
         res.status(200).json(result);
     }catch(err){
         console.log(err);

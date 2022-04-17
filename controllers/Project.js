@@ -22,6 +22,54 @@ export const getImagesByProject = async (req,res) => {
     }
 }
 
+export const getAllProjects = async(req,res) => {
+
+    let query = 'select p.project_id, p.project_name, p.created_at, u.user_id, u.first_name, u.last_name, pu.rubric_id, r.rubric_title, ims.image_set_name, ims.image_set_id, pu.status from project as p inner join project_user as pu on p.project_id = pu.project_id inner join user as u on u.user_id = pu.user_id inner join rubric as r on pu.rubric_id = r.rubric_id inner join image_set as ims where ims.image_set_id = pu.image_set_id';
+    try{
+        let projects = await pool.query(query);
+
+        let data = projects[0];
+
+        const result = data.reduce((q, {project_id, created_at, project_name, rubric_id, rubric_title, user_id, first_name, last_name, status, users, image_set_id, image_set_name}) =>{
+            q[project_id] = q[project_id] ?? {
+                project_id: project_id,
+                project_name: project_name,
+                rubric_id: rubric_id,
+                rubric_title: rubric_title,
+                image_set_id: image_set_id,
+                image_set_name: image_set_name,
+                created_at: created_at,
+                users: [],
+            };
+
+            let user = {
+                user_id: user_id,
+                first_name: first_name,
+                last_name: last_name,
+                status: status,
+            }
+
+            if(Array.isArray(users)){
+                q[project_id] = q[project_id].users.concat(users);
+            }else{
+                q[project_id].users.push(user);
+            }
+
+            return q
+        },{});
+
+        for(const v in result){
+            console.log(result[v]);
+        }
+
+        res.status(200).json(result);
+    }catch(err){
+        console.log(err);
+        res.status(400).send(err);
+    }
+
+}
+
 export const getUserProjects = async (req,res) => {
     if (req.user.role === 'admin'){
         res.status(200).send('');
@@ -35,7 +83,7 @@ export const getUserProjects = async (req,res) => {
 
     // add project id
 
-    let q = 'select p.project_id, p.project_name from project_user as pu inner join project as p on pu.project_id = p.project_id inner join user as u where u.user_id = (?)';
+    let q = 'select p.project_id, p.project_name, p.created_at from project_user as pu inner join project as p where pu.project_id = p.project_id and pu.user_id = (?)';
 
     try{
         let data = await pool.query(q, id);
@@ -49,37 +97,72 @@ export const getUserProjects = async (req,res) => {
 
 }
 
-export const createProject = async (req, res) => {
-    const data = req.body;
+export const deleteProject = async (req, res) => {
+    let {id} = req.params;
 
-    let {ProjectName, ProjectCreator} = data;
+    console.log(`Delete Project, ID: ${id}`);
+    res.status(200).send('Good');
 
-    let q = `INSERT INTO project(project_name, user_created)
-            VALUES(?,?)`;
-    let val = ['Project10', 'Sam'];
-
-    // execute the insert statement
+    // delete project_user
+    let deleteProjectUserQuery = 'delete from project_user where project_id = (?)';
     try{
-        const result = await pool.query(q, val);
+        let resp = pool.query(deleteProjectUserQuery, id);
+    }catch(err){
+        console.log(err);
+        res.status(400).send('Deletion of project user failed')
+    }
+
+    let deleteProjectQuery = 'delete from project where project_id = (?)';
+
+    // delete project
+    try{
+        let resp = pool.query(deleteProjectQuery, id);
+    }catch(err){
+        console.log(err);
+        res.status(400).send('Deletion of project failed')
+    }
+}
+
+export const createProject = async (req, res) => {
+    const {ProjectName, ProjectUsers, ImageID, RubricID} = req.body;
+
+    let image_set_id = ImageID[0];
+    let rubric_id = RubricID[0];
+
+    console.log(req.body);
+
+    let userCreated = 'Sam';
+
+    let project_id = null;
+    // Create Project
+    try{
+        let q = `INSERT INTO project(project_name, user_created)
+            VALUES(?,?)`;
+
+        let values = [ProjectName, userCreated];
+
+        const result = await pool.query(q, values);
 
         let {insertId} = result[0];
-
-        res.status(200).json(insertId);
+        project_id = insertId;
     }catch(err){
         console.log(err);
         res.status(400).json(err);
     }
 
-    // const currId = await pool.query(q, val, (err, results) => {
-    //     if (err) {
-    //         res.status(400).json(err);
-    //     }
-    //     // get inserted id
-    //     return {insertId} = results[0];
-    // });
-    //
-    // console.log(currId);
-    //
-    // res.status(200).json(currId);
+    // Create Project Users
+    for (const e of ProjectUsers) {
+        try{
+            let q = `insert into project_user(project_id, user_id, image_set_id, rubric_id) values (${project_id},?,${image_set_id}, ${rubric_id})`;
+            await pool.query(q, e);
+        }catch(err){
+            console.log(err);
+            res.status(400).json(err);
+        }
+    }
+
+
+    res.status(200).send('Good');
+
 }
 

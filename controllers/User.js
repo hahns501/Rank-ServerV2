@@ -37,7 +37,7 @@ export const getAllUsers = async(req,res)=>{
     console.log("Fetching all users");
     try{
         let users = await pool.query(q);
-        console.log(users);
+        // console.log(users);
         res.status(200).json(users[0]);
     }catch(err){
         console.log(err);
