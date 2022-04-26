@@ -22,6 +22,7 @@ export const getImagesByProject = async (req,res) => {
     }
 }
 
+
 export const getAllProjects = async(req,res) => {
 
     let query = 'select p.project_id, p.project_name, p.created_at, u.user_id, u.first_name, u.last_name, pu.rubric_id, r.rubric_title, ims.image_set_name, ims.image_set_id, pu.status from project as p inner join project_user as pu on p.project_id = pu.project_id inner join user as u on u.user_id = pu.user_id inner join rubric as r on pu.rubric_id = r.rubric_id inner join image_set as ims where ims.image_set_id = pu.image_set_id';
@@ -99,12 +100,19 @@ export const getUserProjects = async (req,res) => {
 
 export const submitProjectData = async (req,res) => {
     let data = req.body;
+    let user_id = req.user.id;
+    let project_id = data[0].project_id;
 
-    for(const el of data){
-        console.log(el);
+    console.log(data);
+    let q = `update project_user set status = 1 where project_id = ${project_id} and user_id = ${user_id};`;
+
+    try{
+        let serverRes = await pool.query(q);
+        res.status(200).send('Good');
+    }catch(err){
+        console.log(err);
+        res.status(400).send("Database Error");
     }
-
-    res.status(200).send('Good');
 }
 
 export const getUserProjectDetails = async (req,res) =>{
