@@ -1,4 +1,4 @@
-import express from 'express'
+import express from 'express';
 
 import {createRubric, getAllRubrics, deleteRubric} from "../controllers/Rubric.js";
 
