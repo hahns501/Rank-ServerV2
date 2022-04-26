@@ -1,11 +1,13 @@
 import mysql from 'mysql2/promise';
 
+import 'dotenv/config';
+
 const pool = mysql.createPool({
-    user: 'Shang', // e.g. 'my-db-user'
-    password: 'yoloswag420', // e.g. 'my-db-password'
-    database: 'imageranker', // e.g. 'my-database'
-    host: '35.223.39.32', // e.g. '127.0.0.1'
-    port: '3306', // e.g. '3306'
+    user: process.env.DB_USER, // e.g. 'my-db-user'
+    password: process.env.DB_PASSWORD, // e.g. 'my-db-password'
+    database: process.env.DB_DATABASE, // e.g. 'my-database'
+    host: process.env.DB_HOST, // e.g. '127.0.0.1'
+    port: process.env.DB_PORT, // e.g. '3306'
     // ... Specify additional properties here.
 });
 

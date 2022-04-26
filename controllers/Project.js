@@ -83,7 +83,7 @@ export const getUserProjects = async (req,res) => {
 
     // add project id
 
-    let q = 'select p.project_id, p.project_name, p.created_at from project_user as pu inner join project as p where pu.project_id = p.project_id and pu.user_id = (?)';
+    let q = 'select p.project_id, p.project_name, p.created_at, pu.status from project_user as pu inner join project as p where pu.project_id = p.project_id and pu.user_id = (?)';
 
     try{
         let data = await pool.query(q, id);
@@ -95,6 +95,67 @@ export const getUserProjects = async (req,res) => {
         console.log(err);
     }
 
+}
+
+export const submitProjectData = async (req,res) => {
+    let data = req.body;
+
+    for(const el of data){
+        console.log(el);
+    }
+
+    res.status(200).send('Good');
+}
+
+export const getUserProjectDetails = async (req,res) =>{
+    let {id} = req.params;
+    let user_id = req.user.id;
+
+    let rubric_id = null;
+    let imageData = null;
+    let questionData = null;
+
+    console.log(id);
+    console.log(user_id);
+
+    // get image paths
+    let imageQuery = `select pu.rubric_id, i.image_id, i.image_path from project_user as pu inner join image as i on pu.image_set_id = i.image_set_id where pu.project_id = ${id} and user_id = ${user_id}`;
+
+    try{
+        let imageRecData = await pool.query(imageQuery);
+
+        // extract rubric and create new array without rubric_id
+        let tempImageData = imageRecData[0][0];
+        rubric_id = tempImageData.rubric_id;
+
+        imageData = imageRecData[0].map(({rubric_id, ...rest})=>rest);
+
+    }catch(err){
+        console.log(err);
+        res.status(400).send('Database Error Retrieving Images');
+    }
+
+    // get rubric/questions
+    let questionQuery = `select q.question_id, q.question, q.description, q.min, q.max from rubric as r inner join question as q on r.rubric_id = q.rubric_id where r.rubric_id=${rubric_id}`
+
+    try{
+        let questionRecData = await pool.query(questionQuery);
+        questionData = questionRecData[0];
+
+    }catch(err){
+        console.log(err);
+        res.status(400).send('Database Error Retrieving Questions');
+    }
+
+    // process data to send
+    const data = {
+        "ImageIds": imageData,
+        "Questions": questionData,
+    }
+
+    console.log(data);
+
+    res.status(200).json(data);
 }
 
 export const deleteProject = async (req, res) => {
