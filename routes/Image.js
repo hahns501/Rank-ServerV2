@@ -6,6 +6,6 @@ import {getAllImageSets} from "../controllers/Image.js";
 
 const router = express.Router();
 
-router.get('/', getAllImageSets);
+router.get('', getAllImageSets);
 
 export default router
