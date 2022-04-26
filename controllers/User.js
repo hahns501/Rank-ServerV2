@@ -5,14 +5,14 @@ import {Verify} from '../middleware/Verify.js';
 const users = [
     {
         id: '1',
-        username: 'Shang',
-        password: '12345678',
+        username: 'Admin',
+        password: '1234',
         role: "admin"
     },
     {
         id: '1',
-        username: 'Jank',
-        password: '12345678',
+        username: 'User',
+        password: '1234',
         role: "user"
     }
 ]
