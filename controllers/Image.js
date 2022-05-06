@@ -2,8 +2,8 @@ import pool from '../db.js';
 import AWS from "aws-sdk";
 
 AWS.config.update({
-    accessKeyId: "AKIARZIG7UBYCFUND2MU",
-    secretAccessKey: "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",
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_KEY,
     region:"us-east-1",
 });
 
