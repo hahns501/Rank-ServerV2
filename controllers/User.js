@@ -2,20 +2,6 @@ import jwt from 'jsonwebtoken';
 import pool from '../db.js';
 import {Verify} from '../middleware/Verify.js';
 
-const users = [
-    {
-        id: '1',
-        username: 'Admin',
-        password: '1234',
-        role: "admin"
-    },
-    {
-        id: '1',
-        username: 'User',
-        password: '1234',
-        role: "user"
-    }
-]
 
 // Generate an access token
 // Creat env file and use real secret key
@@ -91,13 +77,37 @@ export const testUser = async(req,res) => {
 export const loginUser = async (req, res) => {
     console.log("Logging in User");
 
-    const {username, password} = req.body;
-    console.log(`Recieved username: ${username}, password: ${password}`)
+    const {email, password} = req.body;
+    console.log(`Recieved username: ${email}, password: ${password}`);
+
+    let q = `select user_id,email,password,role from user where user.email = '${email}'`
+
 
     // replace with actual db
-    const user = users.find( u => {
-        return u.username === username && u.password === password;
-    });
+    let user = null;
+    const dbRes = null;
+
+    try{
+        let data = await pool.query(q);
+
+        let serEmail = data[0][0].email;
+        let serPass = data[0][0].password;
+        let serRole = data[0][0].role;
+        let serId = data[0][0].user_id;
+
+        if(serPass !== password){
+            console.log('Incorrect Password');
+            res.status(400).send("Password is incorrect");
+            return
+        }
+
+        user = {'id': serId, 'email':serEmail, 'role':serRole};
+    }catch(err){
+        res.status(400).send("No User Found");
+        return
+    }
+
+    console.log(user);
 
     if(user){
         const accessToken = generateAccessToken(user);
@@ -109,7 +119,7 @@ export const loginUser = async (req, res) => {
 
         const userInfo = {
             "user" : {
-                "username" : user.username,
+                "email" : user.email,
                 "role" : user.role
             },
             "accessToken" : accessToken
@@ -117,15 +127,22 @@ export const loginUser = async (req, res) => {
 
         res.send(userInfo);
     }else{
+        console.log('no user')
         res.status(400).send("No User Found");
     }
+
 }
 
 export const createUser = async(req,res) => {
     let newUserData = req.body;
 
+    let q = `insert into user(email, password, first_name, last_name, job_position, role) values ('${newUserData.email}', '${newUserData.password}', '${newUserData.fName}', '${newUserData.lName}', '${newUserData.occupation}', '${newUserData.role}')`;
+
+    console.log(newUserData);
+
     try{
-        console.log(newUserData);
+        let dbRes = await pool.query(q);
+        console.log(dbRes);
         res.status(200).send("Good");
     }catch(err){
         console.log(err);

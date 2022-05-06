@@ -10,6 +10,7 @@ router.post('/login', loginUser);
 router.post('/refresh', refreshToken);
 router.post('/logout', Verify, logoutUser);
 router.post('/test', Verify, testUser);
+router.post('/register', createUser);
 
 // verify
 router.get('/', getAllUsers);

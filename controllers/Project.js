@@ -123,7 +123,7 @@ export const getUserProjectDetails = async (req,res) =>{
     let imageData = null;
     let questionData = null;
 
-    console.log(id);
+    console.log(`id: ${req.params}`);
     console.log(user_id);
 
     // get image paths

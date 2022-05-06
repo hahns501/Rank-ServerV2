@@ -1,10 +1,3 @@
-// const express = require('express');
-// const app = express();
-// const cors = require('cors');
-// const bodyParser = require('body-parser');
-//
-// const userRoutes = require('./routes/User.js');
-
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -31,13 +24,6 @@ app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
-
-// app.get('/test', (req,res) =>{
-//
-//     let temp = insert();
-//
-//     res.send(temp);
-// });
 
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}...`);
